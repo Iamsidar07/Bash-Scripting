@@ -1,4 +1,5 @@
 This is my eldenring text file
+That's why I'm loving it Baby...
 
 
 
@@ -11,7 +12,6 @@ This is my eldenring text file
 
 
 
-
-I Love You
+I Love You Monu.
 
 This is the end of the eldenring.txt and line number is 17

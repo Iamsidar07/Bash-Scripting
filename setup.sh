@@ -37,47 +37,54 @@ initialize_shadcn() {
 
 # Function to create a GitHub repository
 create_github_repo() {
+	read -p "Do you wanna create github repository? [y/n] " should_create_repository
+	if [ $should_create_repository = "y" ]; then
 
-	echo "Creating repo name: $repo_name..."
+		echo "Creating repo $repo_name..."
 
-	result=$(
-		http POST https://api.github.com/user/repos \
-			"Accept: application/vnd.github.v3+json" \
-			"Authorization: Bearer $GITHUB_TOKEN" \
-			"X-GitHub-Api-Version: $API_VERSION" \
-			name="$repo_name" description="" homepage="https://github.com" private:=false is_template:=false
-	)
+		result=$(
+			http POST https://api.github.com/user/repos \
+				"Accept: application/vnd.github.v3+json" \
+				"Authorization: Bearer $GITHUB_TOKEN" \
+				"X-GitHub-Api-Version: $API_VERSION" \
+				name="$repo_name" description="" homepage="https://github.com" private:=false is_template:=false
+		)
 
-	# Extract the SSH URL from the result JSON
-	ssh_url=$(echo "$result" | jq -r '.ssh_url')
+		# Extract the SSH URL from the result JSON
+		ssh_url=$(echo "$result" | jq -r '.ssh_url')
 
-	echo "Cloning $ssh_url"
-	git clone "$ssh_url"
+		echo "Cloning $ssh_url"
+		git clone "$ssh_url"
 
-	# Extract the repository name from the result JSON
-	repo_name=$(echo "$result" | jq -r '.name')
+		# Extract the repository name from the result JSON
+		repo_name=$(echo "$result" | jq -r '.name')
 
-	echo "$repo_name"
-	echo "Changing directory to $repo_name"
-	cd "$repo_name"
-
-	initialize_next_app
-
-	initialize_shadcn
-
-	if [[ !$(ls | grep README.md) ]]; then
-		touch README.md
-		echo "# $repo_name" >>README.md
-		git add README.md
-		git commit -m "Initial Commit"
-		git push
+		echo "$repo_name"
+		echo "Changing directory to $repo_name"
+		cd "$repo_name"
 	fi
-
-	# Open with vscode or vim
-	# code .
-	vim .
 
 }
 
 # Call the create_github_repo function
 create_github_repo
+
+initialize_next_app
+
+initialize_shadcn
+
+if [[ !$(ls | grep README.md) ]]; then
+	touch README.md
+	echo "# $repo_name" >>README.md
+	git add README.md
+	git commit -m "Initial Commit"
+	git push
+fi
+
+# Open with vscode or vim
+# code .
+read -p "Open with vscode [y/n]" code_editor
+if [[ $code_editor = "y" ]]; then
+	code .
+fi
+vim .
